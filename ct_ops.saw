@@ -1,0 +1,24 @@
+
+l <- llvm_load_module "ct_ops.bc";
+
+print "Extracting reference term: eq_ref";
+eq_ref <- crucible_llvm_extract l "eq_ref";
+
+print "Extracting reference term: gte_ref";
+gte_ref <- crucible_llvm_extract l "gte_ref";
+
+print "Extracting implementation term: FStar_UInt64_eq_mask";
+FStar_UInt64_eq_mask <- crucible_llvm_extract l "FStar_UInt64_eq_mask";
+
+print "Extracting implementation term: FStar_UInt64_gte_mask";
+FStar_UInt64_gte_mask <- crucible_llvm_extract l "FStar_UInt64_gte_mask";
+
+print "Proving equivalence: eq_ref == FStar_UInt64_eq_mask";
+let thm1 = {{ \x y -> eq_ref x y == FStar_UInt64_eq_mask x y }};
+result <- prove abc thm1;
+print result;
+
+print "Proving equivalence: gte_ref == FStar_UInt64_gte_mask";
+let thm2 = {{ \x y -> gte_ref x y == FStar_UInt64_gte_mask x y }};
+result <- prove abc thm2;
+print result;
